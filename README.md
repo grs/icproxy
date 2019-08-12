@@ -66,6 +66,24 @@ and/or
 telnet $(oc get service echo -o=jsonpath='{.spec.clusterIP}') 9090
 ```
 
+For testing on the minishift platform users must take extra steps to expose the services
+to the host system. For the tcp echo service add the following to 
+examples/tcp/service-proxy.yaml between 'ports' and 'selector':
+```
+    type: LoadBalancer
+```
+
+then execute the command
+```
+oc expose service echo
+```
+
+This creates a route to the echo service. Note that the nodePort made visible to the host system
+may not be equal to the service port defined by the original application. This can be verified with
+```
+telnet $(oc get route echo -o jsonpath='{.spec.host}') $(oc get service echo -o jsonpath='{..nodePort}')
+```
+
 ### deployer
 
 There is also a deployer component that will automatically deploy the
